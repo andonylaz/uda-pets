@@ -15,12 +15,14 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +35,9 @@ import com.example.android.pets.data.PetDbHelper;
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity {
+
+    private PetDbHelper mDbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,20 @@ public class CatalogActivity extends AppCompatActivity {
         });
 
 
+        // get an instance of PetDbHelper
+        mDbHelper = new PetDbHelper(this);
+
+        displayDatabaseInfo();
+    }
+
+
+    /**
+     * When the activity is 'continued'. This will be called after the user leaves then
+     * comes back to it.
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
         displayDatabaseInfo();
     }
 
@@ -58,11 +77,8 @@ public class CatalogActivity extends AppCompatActivity {
      * the pets database.
      */
     private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        PetDbHelper mDbHelper = new PetDbHelper(this);
 
-        // Create and/or open a database to read from it
+        // Create and/or open a database to read from it -- similar to ".open shelter.db" on terminal
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         // Perform this raw SQL query "SELECT * FROM pets"
@@ -80,6 +96,28 @@ public class CatalogActivity extends AppCompatActivity {
         }
     }
 
+    public void insertDummyData(){
+
+        // create a writable connection to database
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Create a new content value class and insert the dummy data
+        // Create a new map of values, where column names are the keys
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PetEntry.COLUMN_PET_NAME, "Toto");
+        contentValues.put(PetEntry.COLUMN_PET_BREED, "Terrier");
+        contentValues.put(PetEntry.COLUMN_PET_GENDER, PetEntry.PET_GENDER_MALE);
+        contentValues.put(PetEntry.COLUMN_PET_WEIGHT, 7);
+
+        // insert the data of the content value using the instance to the database
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, contentValues);
+
+        Log.v("CatalogActivity", "New row id: " + newRowId);
+    }
+
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_catalog.xml file.
@@ -92,10 +130,13 @@ public class CatalogActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
+
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                // Do nothing for now
+                insertDummyData();
+                displayDatabaseInfo();
                 return true;
+
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
                 // Do nothing for now

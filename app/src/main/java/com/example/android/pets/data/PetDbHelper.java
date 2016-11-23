@@ -27,8 +27,6 @@ public class PetDbHelper extends SQLiteOpenHelper{
             "DROP TABLE IF EXISTS " + PetEntry.TABLE_NAME;
 
 
-
-
     // CONSTRUCTOR
     public PetDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,9 +46,9 @@ public class PetDbHelper extends SQLiteOpenHelper{
                 + PetEntry.COLUMN_PET_BREED + " TEXT, "
                 + PetEntry.COLUMN_PET_GENDER + " INTEGER NOT NULL, "
                 + PetEntry.COLUMN_PET_WEIGHT + " INTEGER NOT NULL DEFAULT 0);";
-        Log.e("***************", "In onCreate before creating table");
+
         db.execSQL(SQL_CREATE_PETS_TABLE);
-        Log.e("***************", "In onCreate and have created db table");
+        Log.e(LOG_TAG, "In onCreate and have created db table");
     }
 
 

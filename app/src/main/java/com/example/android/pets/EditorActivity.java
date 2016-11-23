@@ -15,10 +15,14 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,8 +30,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
+import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -50,7 +56,13 @@ public class EditorActivity extends AppCompatActivity {
      * Gender of the pet. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
      */
-    private int mGender = 0;
+    private int mGender = PetEntry.PET_GENDER_UNKNOWN;
+
+    /** A reference to mDbHelper that assists in managing the database*/
+    private PetDbHelper mDbHelper;
+
+    /** The row id for the database that will change with every database update*/
+    public static long row_number_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +74,9 @@ public class EditorActivity extends AppCompatActivity {
         mBreedEditText = (EditText) findViewById(R.id.edit_pet_breed);
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
+
+        // create an instance of PetDbHelper
+        mDbHelper = new PetDbHelper(this);
 
         setupSpinner();
     }
@@ -105,6 +120,47 @@ public class EditorActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Inserts the details of the pet the user has typed into the database.
+     */
+    public void insertPet(){
+
+        // create a writable connection to database
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // get the data from the EditText fields and convert to string
+        Editable petNameEditable = mNameEditText.getText();
+        String petName = petNameEditable.toString().trim();
+
+        Editable petBreedEditable = mBreedEditText.getText();
+        String petBreed = petBreedEditable.toString().trim();
+
+        Editable petWeightEditable = mWeightEditText.getText();
+        String petWeight = petWeightEditable.toString().trim();
+        int weight = Integer.parseInt(petWeight);
+
+        // String petGender = mGender.toString();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(PetEntry.COLUMN_PET_NAME, petName);
+        contentValues.put(PetEntry.COLUMN_PET_BREED, petBreed);
+        contentValues.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        contentValues.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+
+        // insert the user's data into the database
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, contentValues);
+
+        Log.v("EditorActivity", "Row id number: " + newRowId);
+
+        if (newRowId == -1){
+            Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Pet successfully saved, row number: " + newRowId, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_editor.xml file.
@@ -119,7 +175,9 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                insertPet();
+                // Android function that returns to the previous activity
+                finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
@@ -133,4 +191,7 @@ public class EditorActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
 }

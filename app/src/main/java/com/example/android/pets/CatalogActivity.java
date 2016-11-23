@@ -81,9 +81,35 @@ public class CatalogActivity extends AppCompatActivity {
         // Create and/or open a database to read from it -- similar to ".open shelter.db" on terminal
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " + PetEntry.TABLE_NAME, null);
+        // Define projection that specifies which columns from the db you will use for this query.
+        String[] projection = {
+                PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_GENDER,
+                PetEntry.COLUMN_PET_WEIGHT
+        };
+
+        // Filter results WHERE
+        String selection = PetEntry.COLUMN_PET_BREED + " = ?";
+        // Create string as SelectionArgs must contains strings.
+        String[] selectionArgs = { Integer.toString(PetEntry.PET_GENDER_MALE)};
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                PetEntry._ID + " ASC";
+
+        // finally, use the query() method with the parameters that were defined above
+        Cursor cursor = db.query(
+                PetEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).

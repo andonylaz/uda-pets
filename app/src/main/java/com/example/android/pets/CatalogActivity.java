@@ -78,6 +78,9 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void displayDatabaseInfo() {
 
+        // get a reference to the textview
+        TextView displayView = (TextView)findViewById(R.id.text_view_pet);
+
         // Create and/or open a database to read from it -- similar to ".open shelter.db" on terminal
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
@@ -90,31 +93,48 @@ public class CatalogActivity extends AppCompatActivity {
                 PetEntry.COLUMN_PET_WEIGHT
         };
 
-        // Filter results WHERE
-        String selection = PetEntry.COLUMN_PET_BREED + " = ?";
-        // Create string as SelectionArgs must contains strings.
-        String[] selectionArgs = { Integer.toString(PetEntry.PET_GENDER_MALE)};
-
-        // How you want the results sorted in the resulting Cursor
-        String sortOrder =
-                PetEntry._ID + " ASC";
-
         // finally, use the query() method with the parameters that were defined above
         Cursor cursor = db.query(
-                PetEntry.TABLE_NAME,                     // The table to query
+                PetEntry.TABLE_NAME,                      // The table to query
                 projection,                               // The columns to return
-                selection,                                // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // The columns for the WHERE clause
+                null,                                     // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
+                null                                      // The sort order
         );
 
         try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText("Number of rows in pets database table: " + cursor.getCount());
+            // Display the data that was retrieved and stored in the cursor
+
+            displayView.setText("Number of rows in pets(*) database table: " + cursor.getCount());
+
+            int petId = cursor.getColumnIndex(PetEntry._ID);
+            int petName = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+            int petBreed = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+            int petGender = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+            int petWeight = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+
+            // move the cursor to the first position
+            //cursor.moveToFirst();
+
+            // keep moving through cursor until end
+            while (cursor.moveToNext()) {
+                int petIdValue = cursor.getInt(petId);
+                String petNameValue = cursor.getString(petName);
+                String petBreedValue = cursor.getString(petBreed);
+                int petGenderValue = cursor.getInt(petGender);
+                String genderString = getGender(petGenderValue);
+                int petWeightValue = cursor.getInt(petWeight);
+
+                displayView.append(" \n" + petIdValue + " " +
+                        petNameValue + " " +
+                        petBreedValue + " " +
+                        genderString + " " +
+                        petWeightValue);
+
+            }
+
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
@@ -142,7 +162,16 @@ public class CatalogActivity extends AppCompatActivity {
     }
 
 
-
+    public String getGender(int gender){
+        switch(gender){
+            case 1:
+                return "male";
+            case 2:
+                return "female";
+            default:
+                return "unknown";
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -15,8 +15,9 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,8 @@ import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
+
+import static java.lang.Long.valueOf;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -125,8 +128,6 @@ public class EditorActivity extends AppCompatActivity {
      */
     public void insertPet(){
 
-        // create a writable connection to database
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // get the data from the EditText fields and convert to string
         Editable petNameEditable = mNameEditText.getText();
@@ -149,14 +150,17 @@ public class EditorActivity extends AppCompatActivity {
         contentValues.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
         // insert the user's data into the database
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, contentValues);
+        Uri returnedUri = getContentResolver().insert(PetEntry.CONTENT_URI, contentValues);
+
+        // strip away the uri and retrieve id value from the end
+        long newRowId = valueOf(ContentUris.parseId(returnedUri));
 
         Log.v("EditorActivity", "Row id number: " + newRowId);
 
         if (newRowId == -1){
             Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Pet successfully saved, row number: " + newRowId, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Pet saved", Toast.LENGTH_SHORT).show();
         }
     }
 

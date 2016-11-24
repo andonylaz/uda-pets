@@ -18,15 +18,15 @@ package com.example.android.pets;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
@@ -81,8 +81,6 @@ public class CatalogActivity extends AppCompatActivity {
         // get a reference to the textview
         TextView displayView = (TextView)findViewById(R.id.text_view_pet);
 
-        // Create and/or open a database to read from it -- similar to ".open shelter.db" on terminal
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         // Define projection that specifies which columns from the db you will use for this query.
         String[] projection = {
@@ -94,7 +92,7 @@ public class CatalogActivity extends AppCompatActivity {
         };
 
         // finally, use the query() method with the parameters that were defined above
-        Cursor cursor = db.query(
+        /*Cursor cursor = db.query(
                 PetEntry.TABLE_NAME,                      // The table to query
                 projection,                               // The columns to return
                 null,                                     // The columns for the WHERE clause
@@ -103,6 +101,16 @@ public class CatalogActivity extends AppCompatActivity {
                 null,                                     // don't filter by row groups
                 null                                      // The sort order
         );
+        */
+
+        // Perform a query on the provider using the ContentResolver
+        // Use the {@link data.PetContract.PetEntry#CONTENT_URI} to access the pet data
+        Cursor cursor = getContentResolver().query(
+                PetEntry.CONTENT_URI,   // The content uri of the pets table
+                projection,             // The columns to return for each row
+                null,                   // Selection criteria
+                null,                   // Selection criteria
+                null);                  // The sort order for the returned rows
 
         try {
             // Display the data that was retrieved and stored in the cursor
@@ -144,8 +152,6 @@ public class CatalogActivity extends AppCompatActivity {
 
     public void insertDummyData(){
 
-        // create a writable connection to database
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // Create a new content value class and insert the dummy data
         // Create a new map of values, where column names are the keys
@@ -155,10 +161,10 @@ public class CatalogActivity extends AppCompatActivity {
         contentValues.put(PetEntry.COLUMN_PET_GENDER, PetEntry.PET_GENDER_MALE);
         contentValues.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
-        // insert the data of the content value using the instance to the database
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, contentValues);
 
-        Log.v("CatalogActivity", "New row id: " + newRowId);
+        Uri returnedUri = getContentResolver().insert(PetEntry.CONTENT_URI, contentValues);
+
+        Toast.makeText(this, "Dummy data inserted into database", Toast.LENGTH_SHORT).show();
     }
 
 

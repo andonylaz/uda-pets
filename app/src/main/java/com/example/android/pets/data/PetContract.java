@@ -1,5 +1,6 @@
 package com.example.android.pets.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -29,6 +30,18 @@ public final class PetContract {
         public static final int PET_GENDER_UNKNOWN = 0;
         public static final int PET_GENDER_MALE = 1;
         public static final int PET_GENDER_FEMALE = 2;
+
+        // CONTENT AUTHORITY
+        public static final String CONTENT_AUTHORITY = "com.example.android.pets";
+
+        // TO MAKE THIS STRING INTO A URI WE USE THE 'parse' METHOD
+        public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+        // TABLE NAME FOR THE PATH SECTION OF THE URI
+        public static final String PATH_PETS = "pets";
+
+        // APPENDS THE BASE CONTENT URI(which contains scheme and authority) TO THE PATH SEGMENT
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
 
     }
 }

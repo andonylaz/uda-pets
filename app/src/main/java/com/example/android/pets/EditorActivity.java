@@ -158,10 +158,18 @@ public class EditorActivity extends AppCompatActivity {
         Log.v("EditorActivity", "Row id number: " + newRowId);
 
         if (newRowId == -1){
-            Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_saving_pet, Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Pet saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.successful_pet_save, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     *  Deletes the current pet
+     */
+    public void deletePet(){
+
+
     }
 
 
@@ -185,7 +193,8 @@ public class EditorActivity extends AppCompatActivity {
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
-                // Do nothing for now
+
+                deletePet();
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:

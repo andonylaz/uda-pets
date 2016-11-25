@@ -162,7 +162,7 @@ public class CatalogActivity extends AppCompatActivity {
         contentValues.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
 
-        Uri returnedUri = getContentResolver().insert(PetEntry.CONTENT_URI, contentValues);
+        Uri returnedUri =getContentResolver().insert(PetEntry.CONTENT_URI, contentValues);
 
         Toast.makeText(this, "Dummy data inserted into database", Toast.LENGTH_SHORT).show();
     }

@@ -1,5 +1,6 @@
 package com.example.android.pets.data;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -43,5 +44,27 @@ public final class PetContract {
         // APPENDS THE BASE CONTENT URI(which contains scheme and authority) TO THE PATH SEGMENT
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PETS);
 
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a list of pets.
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a single pet.
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PETS;
+
+        /**
+         * Returns whether or not the given gender is {@link #PET_GENDER_UNKNOWN}, {@link #PET_GENDER_MALE},
+         * or {@link #PET_GENDER_FEMALE}.
+         */
+        public static boolean isValidGender(int gender) {
+            if (gender == PET_GENDER_UNKNOWN || gender == PET_GENDER_MALE || gender == PET_GENDER_FEMALE) {
+                return true;
+            }
+            return false;
+        }
     }
 }

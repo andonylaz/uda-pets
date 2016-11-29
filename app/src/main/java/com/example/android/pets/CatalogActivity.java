@@ -25,7 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -78,8 +78,8 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void displayDatabaseInfo() {
 
-        // get a reference to the textview
-        TextView displayView = (TextView)findViewById(R.id.text_view_pet);
+        // get a reference to the ListView
+        ListView displayListView = (ListView)findViewById(R.id.text_view_pet);
 
 
         // Define projection that specifies which columns from the db you will use for this query.
@@ -112,42 +112,14 @@ public class CatalogActivity extends AppCompatActivity {
                 null,                   // Selection criteria
                 null);                  // The sort order for the returned rows
 
-        try {
-            // Display the data that was retrieved and stored in the cursor
 
-            displayView.setText("Number of rows in pets(*) database table: " + cursor.getCount());
+        // Setup cursor adapter using cursor from last step
+        PetCursorAdapter petCursorAdapter = new PetCursorAdapter(this, cursor);
 
-            int petId = cursor.getColumnIndex(PetEntry._ID);
-            int petName = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-            int petBreed = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-            int petGender = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-            int petWeight = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+        // Attach cursor adapter to the ListView
+        displayListView.setAdapter(petCursorAdapter);
 
-            // move the cursor to the first position
-            //cursor.moveToFirst();
 
-            // keep moving through cursor until end
-            while (cursor.moveToNext()) {
-                int petIdValue = cursor.getInt(petId);
-                String petNameValue = cursor.getString(petName);
-                String petBreedValue = cursor.getString(petBreed);
-                int petGenderValue = cursor.getInt(petGender);
-                String genderString = getGender(petGenderValue);
-                int petWeightValue = cursor.getInt(petWeight);
-
-                displayView.append(" \n" + petIdValue + " " +
-                        petNameValue + " " +
-                        petBreedValue + " " +
-                        genderString + " " +
-                        petWeightValue);
-
-            }
-
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
     }
 
     public void insertDummyData(){
